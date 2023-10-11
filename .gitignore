@@ -162,3 +162,7 @@ cython_debug/
 .env
 *.env*
 **/*.env
+
+GroundingDINO/
+GroundingDINO
+GroundingDINO/*
