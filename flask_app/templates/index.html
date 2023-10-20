@@ -10,18 +10,30 @@
         <h1>Find missing object</h1>
     </header>
     <main>
-        <p>text here</p>
-            <button id="myButton">Click here</button>
-    <h1>Counter: <span id="counter">0</span></h1>
+        
+        <button id="myButton">Listen</button>
+        <form id="videoForm" action="/toggle_video" method="post">
+            <button type="submit" id="startVideo">Toggle Video</button>
+        </form>
+        
+        <h1>Video Stream</h1>
+
+        {% if is_video_on %}
+        <img src="{{ url_for('video') }}" width="640" height="480" />
+        {% endif %}
+        
+    <h1><span id="speech_text"></span></h1>
 
     <script>
         document.getElementById("myButton").addEventListener("click", function () {
-            fetch('/demo', {
+            document.getElementById("speech_text").textContent = "Listening ... ";
+
+            fetch('/get_user_speech', {
                 method: 'POST'
             })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("counter").textContent = data.new_count;
+                    document.getElementById("speech_text").textContent = data.new_count;
                 });
         });
     </script>
