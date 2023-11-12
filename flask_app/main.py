@@ -1,6 +1,14 @@
-from flask import Flask, render_template, jsonify, Response, redirect, url_for
+from json import load
+from flask import Flask, render_template, jsonify, Response, redirect, url_for, send_file, request
 import speech_recognition as sr
 import cv2
+import io
+from utils import identify_object
+import spacy
+from dotenv import load_dotenv
+import replicate
+load_dotenv()
+nlp = spacy.load("en_core_web_sm")
 
 app = Flask(__name__)
 r = sr.Recognizer()
@@ -28,11 +36,41 @@ def video():
 
 is_video_on = False
 
+@app.route('/capture')
+def capture():
+    camera = cv2.VideoCapture(0)
+    success, frame = camera.read()
+    if success:
+        cv2.imwrite('C:/Users/bsais/Desktop/image.jpeg', frame)  
+        return "Frame captured and saved successfully", 200
+    else:
+        return "Could not capture image", 500
+
+
 @app.route('/toggle_video', methods=['POST'])
 def toggle_video():
     global is_video_on
     is_video_on = not is_video_on
     return redirect(url_for('index'))
+
+def get_api_result(item):
+    image_path = 'C:/Users/bsais/Desktop/image.jpeg'
+    output = replicate.run(
+        "yorickvp/llava-13b:2facb4a474a0462c15041b78b1ad70952ea46b5ec6ad29583c0b29dbd4249591",
+        input={"image": open("image_path", "rb"),
+               'prompt':'Please describe this image'}
+    )
+    for item in output:
+        # https://replicate.com/yorickvp/llava-13b/versions/2facb4a474a0462c15041b78b1ad70952ea46b5ec6ad29583c0b29dbd4249591/api#output-schema
+        llava_response+=item
+
+@app.route('/get_vqa_result', methods = ['POST'])
+def get_vqa_res():
+    object_to_be_found = request.json['voice_input']
+    ml_model_result = "testing demo" #get_api_result(object_to_be_found)
+    print("here!!!")
+    return jsonify({"vqa_response": ml_model_result})
+
 
 
 @app.route('/get_user_speech', methods=['POST'])
@@ -41,8 +79,9 @@ def increment_counter():
         print('Please start speaking..\n')
         audio = r.listen(source)
         text = r.recognize_google(audio)
-        print(f"Recognized text: {text}")
-
-    return jsonify({"new_count":text})
+        print(text)
+        obj_to_be_found = identify_object(nlp, text)
+        print(f"Recognized text: {obj_to_be_found}")
+    return jsonify({"new_count":obj_to_be_found})
 if __name__ == '__main__':
     app.run(debug=True)
