@@ -67,7 +67,7 @@ def get_api_result(obj_to_be_found):
 
 @app.route('/get_vqa_result', methods = ['POST'])
 def get_vqa_res():
-    capture()
+    # capture()
     object_to_be_found = request.json['voice_input']
     print(object_to_be_found, "Object to be found")
     ml_model_result = get_api_result(object_to_be_found)
