@@ -2,12 +2,13 @@
 <html>
 
 <head>
-    <title>Fing Missing Object</title>
+    <title>Find Missing Object</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <header>
-        <h1>Find missing object</h1>
+        <h1>Find Missing Object</h1>
     </header>
     <main>
         
@@ -16,15 +17,14 @@
             <button type="submit" id="startVideo">Toggle Video</button>
         </form>
         
-        <h1>Video Stream</h1>
-
         {% if is_video_on %}
+        <h1>Video Stream</h1>
         <img src="{{ url_for('video') }}" width="640" height="480" />
         {% endif %}
         
     <h1><span id="speech_text"></span></h1>
 
-    <h3><span id = "llava_text">LLava Response: _______</span></h3>
+    <h3><span id = "llava_text"></span></h3>
 
     <script>
         document.getElementById("myButton").addEventListener("click", function () {
@@ -35,13 +35,13 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("speech_text").textContent = data.new_count;
+                    document.getElementById("speech_text").textContent = "Object to be found: "+data.obj_to_be_found;
            fetch('/get_vqa_result', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ voice_input: data.new_count })
+                body: JSON.stringify({ voice_input: data.obj_to_be_found })
             })
             .then(response => response.json())
             .then(data => {

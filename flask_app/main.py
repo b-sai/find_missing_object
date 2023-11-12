@@ -41,7 +41,7 @@ def capture():
     camera = cv2.VideoCapture(0)
     success, frame = camera.read()
     if success:
-        cv2.imwrite('C:/Users/bsais/Desktop/image.jpeg', frame)  
+        cv2.imwrite('C:/Users/bsais/Desktop/image.jpg', frame)  
         return "Frame captured and saved successfully", 200
     else:
         return "Could not capture image", 500
@@ -53,28 +53,30 @@ def toggle_video():
     is_video_on = not is_video_on
     return redirect(url_for('index'))
 
-def get_api_result(item):
-    image_path = 'C:/Users/bsais/Desktop/image.jpeg'
+def get_api_result(obj_to_be_found):
+    image_path = 'C:/Users/bsais/Desktop/image.jpg'
     output = replicate.run(
         "yorickvp/llava-13b:2facb4a474a0462c15041b78b1ad70952ea46b5ec6ad29583c0b29dbd4249591",
-        input={"image": open("image_path", "rb"),
-               'prompt':'Please describe this image'}
+        input={"image": open(image_path, "rb"),
+               'prompt': f'Please describe where {obj_to_be_found} is in this image'}
     )
+    llava_response = "" 
     for item in output:
-        # https://replicate.com/yorickvp/llava-13b/versions/2facb4a474a0462c15041b78b1ad70952ea46b5ec6ad29583c0b29dbd4249591/api#output-schema
         llava_response+=item
+    return llava_response
 
 @app.route('/get_vqa_result', methods = ['POST'])
 def get_vqa_res():
+    capture()
     object_to_be_found = request.json['voice_input']
-    ml_model_result = "testing demo" #get_api_result(object_to_be_found)
-    print("here!!!")
+    print(object_to_be_found, "Object to be found")
+    ml_model_result = get_api_result(object_to_be_found)
     return jsonify({"vqa_response": ml_model_result})
 
 
 
 @app.route('/get_user_speech', methods=['POST'])
-def increment_counter():
+def get_user_speech():
     with sr.Microphone() as source:
         print('Please start speaking..\n')
         audio = r.listen(source)
@@ -82,6 +84,6 @@ def increment_counter():
         print(text)
         obj_to_be_found = identify_object(nlp, text)
         print(f"Recognized text: {obj_to_be_found}")
-    return jsonify({"new_count":obj_to_be_found})
+    return jsonify({"obj_to_be_found": obj_to_be_found})
 if __name__ == '__main__':
     app.run(debug=True)
