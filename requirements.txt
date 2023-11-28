@@ -1,0 +1,9 @@
+Flask
+opencv-python
+Pillow
+python-dotenv==1.0.0
+spacy==3.7.1
+SpeechRecognition==3.10.0
+transformers==4.25.1
+torc
+pyaudio
