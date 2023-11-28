@@ -1,4 +1,4 @@
-# find_missing_object
+# Voice Object Finder
 
 Find objects by talking to a camera
 
