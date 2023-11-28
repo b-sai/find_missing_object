@@ -22,36 +22,62 @@
         <img src="{{ url_for('video') }}" width="640" height="480" />
         {% endif %}
         
-    <h1><span id="speech_text"></span></h1>
+        <h1><span id="speech_text"></span></h1>
 
-    <h3><span id = "llava_text"></span></h3>
+        <h3><span id="llava_text"></span></h3>
 
-    <script>
-        document.getElementById("myButton").addEventListener("click", function () {
-            document.getElementById("speech_text").textContent = "Listening ... ";
+        <script>
+            document.getElementById("myButton").addEventListener("click", function () {
+                event.preventDefault();  // Prevent form submission
 
-            fetch('/get_user_speech', {
-                method: 'POST'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("speech_text").textContent = "Object to be found: "+data.obj_to_be_found;
-           fetch('/get_vqa_result', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ voice_input: data.obj_to_be_found })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("llava_text").textContent = "Missing Object Description: " + data.vqa_response;
-            })
-            .catch(error => console.error('Error in second API call:', error));
-        })
-        .catch(error => console.error('Error in first API call:', error));
-    });
-    </script>
+                document.getElementById("speech_text").textContent = "Listening ... ";
+
+                fetch('/get_user_speech', {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("speech_text").textContent = "Object to be found: " + data.obj_to_be_found;
+                        fetch('/get_vqa_result', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ voice_input: data.obj_to_be_found })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById("llava_text").textContent = "Missing Object Description: " + data.vqa_response;
+                                console.log("0");
+                                fetch('/toggle_video', { method: 'POST' })
+                                .catch(error => console.error('Error toggling video:', error));
+                                document.getElementById("startVideo").click();
+
+                                // Store the text content in variables
+                                var speechText = document.getElementById("speech_text").textContent;
+                                var llavaText = document.getElementById("llava_text").textContent;
+
+                                // Store the text content in session storage
+                                sessionStorage.setItem("speechText", speechText);
+                                sessionStorage.setItem("llavaText", llavaText);
+                            })
+                            .catch(error => console.error('Error in second API call:', error));
+                    })
+                    .catch(error => console.error('Error in first API call:', error));
+            });
+
+            // Check if there is stored text content in session storage
+            var storedSpeechText = sessionStorage.getItem("speechText");
+            var storedLlavaText = sessionStorage.getItem("llavaText");
+
+            // Set the stored text content back to the respective elements
+            if (storedSpeechText) {
+                document.getElementById("speech_text").textContent = storedSpeechText;
+            }
+            if (storedLlavaText) {
+                document.getElementById("llava_text").textContent = storedLlavaText;
+            }
+        </script>
 
 
     </main>
