@@ -1,0 +1,9 @@
+Flask
+opencv-python
+Pillow
+python-dotenv 
+spacy 
+SpeechRecognition 
+transformers
+torch
+pyaudio
