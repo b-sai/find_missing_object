@@ -8,20 +8,23 @@
 
 <body>
     <header>
-        <h1>Find Missing Object</h1>
+        <h1>FIND   MISSING   OBJECTS</h1>
     </header>
     <main>
-        
-        <button id="myButton">Listen</button>
-        <form id="videoForm" action="/toggle_video" method="post">
-            <button type="submit" id="startVideo">Toggle Video</button>
-        </form>
-        
+        <div class="button-container">
+            <button class="button" id="myButton">LISTEN 🎙️</button>
+            <form id="videoForm" action="/toggle_video" method="post">
+                <button class="button" type="submit" id="startVideo">TOGGLE VIDEO </button>
+            </form>
+        </div>        
         {% if is_video_on %}
         <h1>Video Stream</h1>
         <img src="{{ url_for('video') }}" width="640" height="480" />
         {% endif %}
-        
+
+        </video>
+    </div>        
+        </main>
         <h1><span id="speech_text"></span></h1>
 
         <h3><span id="llava_text"></span></h3>
@@ -29,15 +32,14 @@
         <script>
             document.getElementById("myButton").addEventListener("click", function () {
                 event.preventDefault();  // Prevent form submission
-
-                document.getElementById("speech_text").textContent = "Listening ... ";
+                document.getElementById("speech_text").textContent = "Listening 🎤 ... ";
 
                 fetch('/get_user_speech', {
                     method: 'POST'
                 })
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById("speech_text").textContent = "Object to be found: " + data.obj_to_be_found;
+                        document.getElementById("speech_text").textContent = "Requested object : " + data.obj_to_be_found;
                         fetch('/get_vqa_result', {
                             method: 'POST',
                             headers: {
@@ -47,7 +49,7 @@
                         })
                             .then(response => response.json())
                             .then(data => {
-                                document.getElementById("llava_text").textContent = "Missing Object Description: " + data.vqa_response;
+                                document.getElementById("llava_text").textContent = "Description :  " + data.vqa_response;
                                 console.log("0");
                                 fetch('/toggle_video', { method: 'POST' })
                                 .catch(error => console.error('Error toggling video:', error));
@@ -77,9 +79,19 @@
             if (storedLlavaText) {
                 document.getElementById("llava_text").textContent = storedLlavaText;
             }
+
+            function toggleVideo() {
+        var videoContainer = document.getElementById("videoContainer");
+        var videoElement = document.getElementById("videoElement");
+
+        if (videoContainer.style.display === "none") {
+            videoContainer.style.display = "block";
+            videoElement.src = "{{ url_for('video') }}"; // Update video source
+        } else {
+            videoContainer.style.display = "none";
+        }
+    }
         </script>
-
-
     </main>
 </body>
 
