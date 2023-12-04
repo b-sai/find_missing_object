@@ -10,7 +10,7 @@ Discover and identify objects using your voice with this innovative project. The
 
 ## Web Interface Preview
 
-![Web Interface Preview](screenshots/preview.jpeg)
+![Web Interface Preview](screenshots/preview.png)
 
 ## Setup
 
